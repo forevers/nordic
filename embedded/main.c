@@ -1,29 +1,3 @@
-/* Copyright (c) 2015 Nordic Semiconductor. All Rights Reserved.
- *
- * The information contained herein is property of Nordic Semiconductor ASA.
- * Terms and conditions of usage are described in detail in NORDIC
- * SEMICONDUCTOR STANDARD SOFTWARE LICENSE AGREEMENT.
- *
- * Licensees are granted free, non-transferable use of the information. NO
- * WARRANTY of ANY KIND is provided. This heading must NOT be removed from
- * the file.
- *
- */
-
-/** @file
- *
- * @defgroup ble_sdk_bluetooth_template_main main.c
- * @{
- * @ingroup bluetooth_template
- * @brief bluetooth_template main file.
- *
- * This file contains a template for creating a new application using Bluetooth Developper Studio generated code.
- * It has the code necessary to wakeup from button, advertise, get a connection restart advertising on disconnect and if no new
- * connection created go back to system-off mode.
- * It can easily be used as a starting point for creating a new application, the comments identified
- * with 'YOUR_JOB' indicates where and how you can customize.
- */
-
 #include <stdint.h>
 #include <string.h>
 #include "nordic_common.h"
@@ -39,21 +13,23 @@
 #include "softdevice_handler.h"
 #include "app_timer.h"
 #include "peer_manager.h"
-#include "fds.h"
-#include "fstorage.h"
-#include "ble_conn_state.h"
 #include "bsp.h"
 #include "bsp_btn_ble.h"
 #include "canonical_service_if.h"
 #include "debug_service_if.h"
 
+#include "FreeRTOS.h"
+#include "task.h"
+#include "timers.h"
+#include "semphr.h"
+#include "fds.h"
+#include "fstorage.h"
+#include "ble_conn_state.h"
+#include "nrf_drv_clock.h"
 #define NRF_LOG_MODULE_NAME "APP"
 #include "nrf_log.h"
 #include "nrf_log_ctrl.h"
 #include "nrf_ble_qwr.h"
-
-#include "app_scheduler.h"
-#include "app_timer_appsh.h"
 
 
 #define IS_SRVC_CHANGED_CHARACT_PRESENT  1                                          /**< Include or not the service_changed characteristic. if not enabled, the server's database cannot be changed for the lifetime of the device*/
@@ -65,21 +41,23 @@
 #define CENTRAL_LINK_COUNT               0                                          /**< Number of central links used by the application. When changing this number remember to adjust the RAM settings*/
 #define PERIPHERAL_LINK_COUNT            1                                          /**< Number of peripheral links used by the application. When changing this number remember to adjust the RAM settings*/
 
-#define DEVICE_NAME                      "Compacket"                               /**< Name of device. Will be included in the advertising data. */
+#define DEVICE_NAME                      "Compacket"                            	/**< Name of device. Will be included in the advertising data. */
 #define MANUFACTURER_NAME                "MfgNameForCompacket"                      /**< Manufacturer. Will be passed to Device Information Service. */
 #define APP_ADV_INTERVAL                 300                                        /**< The advertising interval (in units of 0.625 ms. This value corresponds to 187.5 ms). */
 #define APP_ADV_TIMEOUT_IN_SECONDS       180                                        /**< The advertising timeout in units of seconds. */
 
 #define APP_TIMER_PRESCALER              0                                          /**< Value of the RTC1 PRESCALER register. */
-#define APP_TIMER_OP_QUEUE_SIZE          15                                          /**< Size of timer operation queues. */
+#define APP_TIMER_OP_QUEUE_SIZE          15                                         /**< Size of timer operation queues. */
 
+#define TEST_INTERVAL      2000
 #define MIN_CONN_INTERVAL                MSEC_TO_UNITS(100, UNIT_1_25_MS)           /**< Minimum acceptable connection interval (0.1 seconds). */
 #define MAX_CONN_INTERVAL                MSEC_TO_UNITS(200, UNIT_1_25_MS)           /**< Maximum acceptable connection interval (0.2 second). */
 #define SLAVE_LATENCY                    0                                          /**< Slave latency. */
 #define CONN_SUP_TIMEOUT                 MSEC_TO_UNITS(4000, UNIT_10_MS)            /**< Connection supervisory timeout (4 seconds). */
 
-#define FIRST_CONN_PARAMS_UPDATE_DELAY   APP_TIMER_TICKS(5000, APP_TIMER_PRESCALER) /**< Time from initiating event (connect or start of notification) to first time sd_ble_gap_conn_param_update is called (5 seconds). */
-#define NEXT_CONN_PARAMS_UPDATE_DELAY    APP_TIMER_TICKS(30000, APP_TIMER_PRESCALER)/**< Time between each call to sd_ble_gap_conn_param_update after the first call (30 seconds). */
+#define FIRST_CONN_PARAMS_UPDATE_DELAY   5000                                       /**< Time from initiating event (connect or start of notification) to first time sd_ble_gap_conn_param_update is called (5 seconds). */
+#define NEXT_CONN_PARAMS_UPDATE_DELAY    30000                                      /**< Time between each call to sd_ble_gap_conn_param_update after the first call (30 seconds). */
+
 #define MAX_CONN_PARAMS_UPDATE_COUNT     3                                          /**< Number of attempts before giving up the connection parameter negotiation. */
 
 #define SEC_PARAM_BOND                   1                                          /**< Perform bonding. */
@@ -93,23 +71,39 @@
 
 #define DEAD_BEEF                        0xDEADBEEF                                 /**< Value used as error code on stack dump, can be used to identify stack location on stack unwind. */
 
+#define OSTIMER_WAIT_FOR_QUEUE           2                                          /**< Number of ticks to wait for the timer queue to be ready */
 static uint16_t                          m_conn_handle = BLE_CONN_HANDLE_INVALID;   /**< Handle of the current connection. */
 static nrf_ble_qwr_t                     m_qwr;                                     /**< Queued Writes structure.*/
 
 /* Maximum size of events to be passed through the scheduler. */
-#define SCHED_MAX_EVENT_SIZE 	16
+#define SCHED_MAX_EVENT_SIZE    16
 #define SCHED_QUEUE_SIZE        32
 
-APP_TIMER_DEF(m_app_timer_id);
+/* device information service */
+static ble_uuid_t m_adv_uuids[] = {{BLE_UUID_DEVICE_INFORMATION_SERVICE, BLE_UUID_TYPE_BLE}}; /**< Universally unique service identifiers. */
 
-#define TIMER_INTERVAL APP_TIMER_TICKS(2000, APP_TIMER_PRESCALER)
+static TimerHandle_t m_test_timer;              /**< Definition of test timer. */
 
-void timer_timeout_handler(void *p_context)
+static SemaphoreHandle_t m_ble_event_ready;     /**< Semaphore raised if there is a new event to be processed in the BLE thread. */
+
+static TaskHandle_t m_ble_stack_thread;         /**< Definition of BLE stack thread. */
+static TaskHandle_t m_logger_thread;            /**< Definition of Logger thread. */
+
+static void advertising_start(void);
+
+
+/**@brief Function for handling the Battery measurement timer time-out.
+ *
+ * @details This function will be called each time the battery level measurement timer expires.
+ *
+ * @param[in] xTimer Handler to the timer that called this function.
+ *                   You may get identifier given to the function xTimerCreate using pvTimerGetTimerID.
+ */
+static void test_timeout_handler(TimerHandle_t xTimer)
 {
+    UNUSED_PARAMETER(xTimer);
 	static int8_t times = 0;
 	NRF_LOG_INFO("timer_timeout_handler() %X\r\n", times++);
-
-//	my_test_send(times);
 
 	uint8_t canonical_notification[SIZE_BLE_PACKET];
 	for (size_t i = 0; i < SIZE_BLE_PACKET; ++i)
@@ -119,10 +113,6 @@ void timer_timeout_handler(void *p_context)
 	canonical_send(canonical_notification);
 	debug_send(canonical_notification);
 }
-
-
-/* device information service */
-static ble_uuid_t m_adv_uuids[] = {{BLE_UUID_DEVICE_INFORMATION_SERVICE, BLE_UUID_TYPE_BLE}}; /**< Universally unique service identifiers. */
 
 
 /**@brief Callback function for asserts in the SoftDevice.
@@ -139,6 +129,130 @@ static ble_uuid_t m_adv_uuids[] = {{BLE_UUID_DEVICE_INFORMATION_SERVICE, BLE_UUI
 void assert_nrf_callback(uint16_t line_num, const uint8_t * p_file_name)
 {
     app_error_handler(DEAD_BEEF, line_num, p_file_name);
+}
+
+
+/**@brief Function for handling Peer Manager events.
+ *
+ * @param[in] p_evt  Peer Manager event.
+ */
+static void pm_evt_handler(pm_evt_t const * p_evt)
+{
+    ret_code_t err_code;
+
+    switch (p_evt->evt_id)
+    {
+        case PM_EVT_BONDED_PEER_CONNECTED:
+            NRF_LOG_DEBUG("Connected to previously bonded device\r\n");
+            err_code = pm_peer_rank_highest(p_evt->peer_id);
+            if (err_code != NRF_ERROR_BUSY)
+            {
+                APP_ERROR_CHECK(err_code);
+            }
+            break;
+
+        case PM_EVT_CONN_SEC_START:
+            break;
+
+        case PM_EVT_CONN_SEC_SUCCEEDED:
+            NRF_LOG_DEBUG("Link secured. Role: %d. conn_handle: %d, Procedure: %d\r\n",
+                                 ble_conn_state_role(p_evt->conn_handle),
+                                 p_evt->conn_handle,
+                                 p_evt->params.conn_sec_succeeded.procedure);
+            err_code = pm_peer_rank_highest(p_evt->peer_id);
+            if (err_code != NRF_ERROR_BUSY)
+            {
+                APP_ERROR_CHECK(err_code);
+            }
+            break;
+
+        case PM_EVT_CONN_SEC_FAILED:
+
+            /** In some cases, when securing fails, it can be restarted directly. Sometimes it can
+             *  be restarted, but only after changing some Security Parameters. Sometimes, it cannot
+             *  be restarted until the link is disconnected and reconnected. Sometimes it is
+             *  impossible, to secure the link, or the peer device does not support it. How to
+             *  handle this error is highly application dependent. */
+            switch (p_evt->params.conn_sec_failed.error)
+            {
+                case PM_CONN_SEC_ERROR_PIN_OR_KEY_MISSING:
+                    // Rebond if one party has lost its keys.
+                    err_code = pm_conn_secure(p_evt->conn_handle, true);
+                    if (err_code != NRF_ERROR_INVALID_STATE)
+                    {
+                        APP_ERROR_CHECK(err_code);
+                    }
+                    break;
+
+                default:
+                    break;
+            }
+            break;
+
+        case PM_EVT_CONN_SEC_CONFIG_REQ:
+        {
+            // Reject pairing request from an already bonded peer.
+            pm_conn_sec_config_t conn_sec_config = {.allow_repairing = false};
+            pm_conn_sec_config_reply(p_evt->conn_handle, &conn_sec_config);
+        } break;
+
+        case PM_EVT_STORAGE_FULL:
+            // Run garbage collection on the flash.
+            err_code = fds_gc();
+            if (err_code != NRF_ERROR_BUSY)
+            {
+                APP_ERROR_CHECK(err_code);
+            }
+            break;
+
+        case PM_EVT_ERROR_UNEXPECTED:
+            // A likely fatal error occurred. Assert.
+            APP_ERROR_CHECK(p_evt->params.error_unexpected.error);
+            break;
+
+        case PM_EVT_PEER_DATA_UPDATE_SUCCEEDED:
+            break;
+
+        case PM_EVT_PEER_DATA_UPDATE_FAILED:
+            // Assert.
+            APP_ERROR_CHECK_BOOL(false);
+            break;
+
+        case PM_EVT_PEER_DELETE_SUCCEEDED:
+            break;
+
+        case PM_EVT_PEER_DELETE_FAILED:
+            // Assert.
+            APP_ERROR_CHECK(p_evt->params.peer_delete_failed.error);
+            break;
+
+        case PM_EVT_PEERS_DELETE_SUCCEEDED:
+            advertising_start();
+            break;
+
+        case PM_EVT_PEERS_DELETE_FAILED:
+            // Assert.
+            APP_ERROR_CHECK(p_evt->params.peers_delete_failed_evt.error);
+            break;
+
+        case PM_EVT_LOCAL_DB_CACHE_APPLIED:
+            break;
+
+        case PM_EVT_LOCAL_DB_CACHE_APPLY_FAILED:
+            // The local database has likely changed, send service changed indications.
+            pm_local_database_has_changed();
+            break;
+
+        case PM_EVT_SERVICE_CHANGED_IND_SENT:
+            break;
+
+        case PM_EVT_SERVICE_CHANGED_IND_CONFIRMED:
+            break;
+
+        default:
+            // No implementation needed.
+            break;
+    }
 }
 
 
@@ -162,10 +276,21 @@ static void fds_evt_handler(fds_evt_t const * const p_evt)
  */
 static void timers_init(void)
 {
+    // Initialize timer module.
+    APP_TIMER_INIT(APP_TIMER_PRESCALER, APP_TIMER_OP_QUEUE_SIZE, false);
+
     // Create timers.
-    uint32_t err_code;
-    err_code = app_timer_create(&m_app_timer_id, APP_TIMER_MODE_REPEATED, timer_timeout_handler);
-    APP_ERROR_CHECK(err_code);
+    m_test_timer = xTimerCreate("TEST",
+                                TEST_INTERVAL,
+                                pdTRUE,
+                                NULL,
+                                test_timeout_handler);
+
+    /* Error checking */
+    if (NULL == m_test_timer)
+    {
+        APP_ERROR_HANDLER(NRF_ERROR_NO_MEM);
+    }
 }
 
 
@@ -217,12 +342,24 @@ static void services_init(void)
 
     err_code = nrf_ble_qwr_init(&m_qwr, &qwr_init);
     APP_ERROR_CHECK(err_code);
-	
+
 	err_code = canonical_bluetooth_init();
     APP_ERROR_CHECK(err_code);
 
 	err_code = debug_bluetooth_init();
     APP_ERROR_CHECK(err_code);
+}
+
+
+/**@brief Function for starting application timers.
+ */
+static void application_timers_start(void)
+{
+    // Start application timers.
+    if (pdPASS != xTimerStart(m_test_timer, OSTIMER_WAIT_FOR_QUEUE))
+    {
+        APP_ERROR_HANDLER(NRF_ERROR_NO_MEM);
+    }
 }
 
 
@@ -277,16 +414,6 @@ static void conn_params_init(void)
     cp_init.error_handler                  = conn_params_error_handler;
 
     err_code = ble_conn_params_init(&cp_init);
-    APP_ERROR_CHECK(err_code);
-}
-
-
-/**@brief Function for starting timers.
-*/
-static void application_timers_start(void)
-{
-    uint32_t err_code;
-    err_code = app_timer_start(m_app_timer_id, TIMER_INTERVAL, NULL);
     APP_ERROR_CHECK(err_code);
 }
 
@@ -431,6 +558,27 @@ static void sys_evt_dispatch(uint32_t sys_evt)
 }
 
 
+/**
+ * @brief Event handler for new BLE events
+ *
+ * This function is called from the SoftDevice handler.
+ * It is called from interrupt level.
+ *
+ * @return The returned value is checked in the softdevice_handler module,
+ *         using the APP_ERROR_CHECK macro.
+ */
+static uint32_t ble_new_event_handler(void)
+{
+    BaseType_t yield_req = pdFALSE;
+
+    // The returned value may be safely ignored, if error is returned it only means that
+    // the semaphore is already given (raised).
+    UNUSED_VARIABLE(xSemaphoreGiveFromISR(m_ble_event_ready, &yield_req));
+    portYIELD_FROM_ISR(yield_req);
+    return NRF_SUCCESS;
+}
+
+
 /**@brief Function for initializing the BLE stack.
  *
  * @details Initializes the SoftDevice and the BLE event interrupt.
@@ -442,7 +590,7 @@ static void ble_stack_init(void)
     nrf_clock_lf_cfg_t clock_lf_cfg = NRF_CLOCK_LFCLKSRC;
 
     // Initialize the SoftDevice handler module.
-    SOFTDEVICE_HANDLER_INIT(&clock_lf_cfg, NULL);
+    SOFTDEVICE_HANDLER_INIT(&clock_lf_cfg, ble_new_event_handler);
 
     ble_enable_params_t ble_enable_params;
     err_code = softdevice_enable_get_default_config(CENTRAL_LINK_COUNT,
@@ -505,129 +653,6 @@ void bsp_event_handler(bsp_event_t event)
             break;
 
         default:
-            break;
-    }
-}
-
-
-/**@brief Function for handling Peer Manager events.
- *
- * @param[in] p_evt  Peer Manager event.
- */
-static void pm_evt_handler(pm_evt_t const * p_evt)
-{
-    ret_code_t err_code;
-
-    switch (p_evt->evt_id)
-    {
-        case PM_EVT_BONDED_PEER_CONNECTED:
-            NRF_LOG_DEBUG("Connected to previously bonded device\r\n");
-            err_code = pm_peer_rank_highest(p_evt->peer_id);
-            if (err_code != NRF_ERROR_BUSY)
-            {
-                APP_ERROR_CHECK(err_code);
-            }
-            break;
-
-        case PM_EVT_CONN_SEC_START:
-            break;
-
-        case PM_EVT_CONN_SEC_SUCCEEDED:
-            NRF_LOG_DEBUG("Link secured. Role: %d. conn_handle: %d, Procedure: %d\r\n",
-                                 ble_conn_state_role(p_evt->conn_handle),
-                                 p_evt->conn_handle,
-                                 p_evt->params.conn_sec_succeeded.procedure);
-            err_code = pm_peer_rank_highest(p_evt->peer_id);
-            if (err_code != NRF_ERROR_BUSY)
-            {
-                APP_ERROR_CHECK(err_code);
-            }
-            break;
-
-        case PM_EVT_CONN_SEC_FAILED:
-
-            /** In some cases, when securing fails, it can be restarted directly. Sometimes it can
-             *  be restarted, but only after changing some Security Parameters. Sometimes, it cannot
-             *  be restarted until the link is disconnected and reconnected. Sometimes it is
-             *  impossible, to secure the link, or the peer device does not support it. How to
-             *  handle this error is highly application dependent. */
-            switch (p_evt->params.conn_sec_failed.error)
-            {
-                case PM_CONN_SEC_ERROR_PIN_OR_KEY_MISSING:
-                    // Rebond if one party has lost its keys.
-                    err_code = pm_conn_secure(p_evt->conn_handle, true);
-                    if (err_code != NRF_ERROR_INVALID_STATE)
-                    {
-                        APP_ERROR_CHECK(err_code);
-                    }
-                    break;
-
-                default:
-                    break;
-            }
-            break;
-
-        case PM_EVT_CONN_SEC_CONFIG_REQ:
-        {
-            // Reject pairing request from an already bonded peer.
-            pm_conn_sec_config_t conn_sec_config = {.allow_repairing = false};
-            pm_conn_sec_config_reply(p_evt->conn_handle, &conn_sec_config);
-        } break;
-
-        case PM_EVT_STORAGE_FULL:
-            // Run garbage collection on the flash.
-            err_code = fds_gc();
-            if (err_code != NRF_ERROR_BUSY)
-            {
-                APP_ERROR_CHECK(err_code);
-            }
-            break;
-
-        case PM_EVT_ERROR_UNEXPECTED:
-            // A likely fatal error occurred. Assert.
-            APP_ERROR_CHECK(p_evt->params.error_unexpected.error);
-            break;
-
-        case PM_EVT_PEER_DATA_UPDATE_SUCCEEDED:
-            break;
-
-        case PM_EVT_PEER_DATA_UPDATE_FAILED:
-            // Assert.
-            APP_ERROR_CHECK_BOOL(false);
-            break;
-
-        case PM_EVT_PEER_DELETE_SUCCEEDED:
-            break;
-
-        case PM_EVT_PEER_DELETE_FAILED:
-            // Assert.
-            APP_ERROR_CHECK(p_evt->params.peer_delete_failed.error);
-            break;
-
-        case PM_EVT_PEERS_DELETE_SUCCEEDED:
-            break;
-
-        case PM_EVT_PEERS_DELETE_FAILED:
-            // Assert.
-            APP_ERROR_CHECK(p_evt->params.peers_delete_failed_evt.error);
-            break;
-
-        case PM_EVT_LOCAL_DB_CACHE_APPLIED:
-            break;
-
-        case PM_EVT_LOCAL_DB_CACHE_APPLY_FAILED:
-            // The local database has likely changed, send service changed indications.
-            pm_local_database_has_changed();
-            break;
-
-        case PM_EVT_SERVICE_CHANGED_IND_SENT:
-            break;
-
-        case PM_EVT_SERVICE_CHANGED_IND_CONFIRMED:
-            break;
-
-        default:
-            // No implementation needed.
             break;
     }
 }
@@ -714,6 +739,7 @@ static void buttons_leds_init(bool * p_erase_bonds)
     uint32_t err_code = bsp_init(BSP_INIT_LED | BSP_INIT_BUTTONS,
                                  APP_TIMER_TICKS(100, APP_TIMER_PRESCALER),
                                  bsp_event_handler);
+
     APP_ERROR_CHECK(err_code);
 
     err_code = bsp_btn_ble_init(NULL, &startup_event);
@@ -723,28 +749,22 @@ static void buttons_leds_init(bool * p_erase_bonds)
 }
 
 
-/**@brief Function for the Power manager.
+/**@brief Thread for handling the Application's BLE Stack events.
+ *
+ * @details This thread is responsible for handling BLE Stack events sent from on_ble_evt().
+ *
+ * @param[in]   arg   Pointer used for passing some arbitrary information (context) from the
+ *                    osThreadCreate() call to the thread.
  */
-static void power_manage(void)
-{
-    uint32_t err_code = sd_app_evt_wait();
-    APP_ERROR_CHECK(err_code);
-}
-
-
-/**@brief Function for application main entry.
- */
-int main(void)
+static void ble_stack_thread(void * arg)
 {
     uint32_t err_code;
     bool erase_bonds;
 
+    UNUSED_PARAMETER(arg);
+
     err_code = NRF_LOG_INIT(NULL);
     APP_ERROR_CHECK(err_code);
-	
-    /* scheduler init */
-    APP_SCHED_INIT(SCHED_MAX_EVENT_SIZE, SCHED_QUEUE_SIZE);
-    APP_TIMER_APPSH_INIT(APP_TIMER_PRESCALER, APP_TIMER_OP_QUEUE_SIZE, true);
 
     // Initialize.
     timers_init();
@@ -766,18 +786,108 @@ int main(void)
     err_code = ble_advertising_start(BLE_ADV_MODE_FAST);
     APP_ERROR_CHECK(err_code);
 
-    // Enter main loop.
-    for (;;)
+    while (1)
     {
-	    app_sched_execute();
-
-        if (NRF_LOG_PROCESS() == false)
+        /* Wait for event from SoftDevice */
+        while (pdFALSE == xSemaphoreTake(m_ble_event_ready, portMAX_DELAY))
         {
-            power_manage();
+            // Just wait again in the case when INCLUDE_vTaskSuspend is not enabled
         }
+
+        // This function gets events from the SoftDevice and processes them by calling the function
+        // registered by softdevice_ble_evt_handler_set during stack initialization.
+        // In this code ble_evt_dispatch would be called for every event found.
+        intern_softdevice_events_execute();
     }
 }
 
-/**
- * @}
+
+/**@brief Function for starting advertising.
  */
+static void advertising_start(void)
+{
+    uint32_t err_code = ble_advertising_start(BLE_ADV_MODE_FAST);
+
+    APP_ERROR_CHECK(err_code);
+}
+
+
+#if NRF_LOG_ENABLED
+/**@brief Thread for handling the logger.
+ *
+ * @details This thread is responsible for processing log entries if logs are deferred.
+ *          Thread flushes all log entries and suspends. It is resumed by idle task hook.
+ *
+ * @param[in]   arg   Pointer used for passing some arbitrary information (context) from the
+ *                    osThreadCreate() call to the thread.
+ */
+static void logger_thread(void * arg)
+{
+    UNUSED_PARAMETER(arg);
+
+    while(1)
+    {
+        NRF_LOG_FLUSH();
+
+        vTaskSuspend(NULL); // Suspend myself
+    }
+}
+#endif //NRF_LOG_ENABLED
+
+
+/**@brief A function which is hooked to idle task.
+ * @note Idle hook must be enabled in FreeRTOS configuration (configUSE_IDLE_HOOK).
+ */
+void vApplicationIdleHook( void )
+{
+     vTaskResume(m_logger_thread);
+}
+
+
+/**@brief Function for application main entry.
+ */
+int main(void)
+{
+    ret_code_t err_code;
+    err_code = nrf_drv_clock_init();
+    APP_ERROR_CHECK(err_code);
+
+    // Do not start any interrupt that uses system functions before system initialisation.
+    // The best solution is to start the OS before any other initalisation.
+
+    // Init a semaphore for the BLE thread.
+    m_ble_event_ready = xSemaphoreCreateBinary();
+    if (NULL == m_ble_event_ready)
+    {
+        APP_ERROR_HANDLER(NRF_ERROR_NO_MEM);
+    }
+
+    err_code = NRF_LOG_INIT(NULL);
+    APP_ERROR_CHECK(err_code);
+
+    // Start execution.
+    if (pdPASS != xTaskCreate(ble_stack_thread, "BLE", 256, NULL, 2, &m_ble_stack_thread))
+    {
+        APP_ERROR_HANDLER(NRF_ERROR_NO_MEM);
+    }
+
+#if NRF_LOG_ENABLED
+    // Start execution.
+    if (pdPASS != xTaskCreate(logger_thread, "LOGGER", 256, NULL, 1, &m_logger_thread))
+    {
+        APP_ERROR_HANDLER(NRF_ERROR_NO_MEM);
+    }
+#endif //NRF_LOG_ENABLED
+
+    /* Activate deep sleep mode */
+    SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
+
+    // Start FreeRTOS scheduler.
+    vTaskStartScheduler();
+
+    while (true)
+    {
+        APP_ERROR_HANDLER(NRF_ERROR_FORBIDDEN);
+    }
+}
+

@@ -1,13 +1,12 @@
-PROJECT_NAME     := bluetoothds_template_sde_pca10040_s132
+PROJECT_NAME     := compacket_pca10040_s132
 TARGETS          := nrf52832_xxaa
 OUTPUT_DIRECTORY := _build
 
 SDK_ROOT := $(HOME)/projects/nordic/nRF5_SDK_12.1.0_0d23e2a
 PROJ_DIR := ../../..
 
-
 $(OUTPUT_DIRECTORY)/nrf52832_xxaa.out: \
-  LINKER_SCRIPT  := bluetoothds_template_gcc_nrf52.ld
+  LINKER_SCRIPT  := compacket_gcc_nrf52.ld
 # Source files common to all targets
 SRC_FILES += \
   $(SDK_ROOT)/components/libraries/log/src/nrf_log_backend_serial.c \
@@ -16,15 +15,25 @@ SRC_FILES += \
   $(SDK_ROOT)/components/libraries/util/app_error.c \
   $(SDK_ROOT)/components/libraries/util/app_error_weak.c \
   $(SDK_ROOT)/components/libraries/fifo/app_fifo.c \
-  $(SDK_ROOT)/components/libraries/timer/app_timer.c \
-  $(SDK_ROOT)/components/libraries/timer/app_timer_appsh.c \
+  $(SDK_ROOT)/components/libraries/timer/app_timer_freertos.c \
   $(SDK_ROOT)/components/libraries/util/app_util_platform.c \
   $(SDK_ROOT)/components/libraries/crc16/crc16.c \
   $(SDK_ROOT)/components/libraries/fds/fds.c \
   $(SDK_ROOT)/components/libraries/fstorage/fstorage.c \
+  $(SDK_ROOT)/components/libraries/hardfault/nrf52/handler/hardfault_handler_gcc.c \
   $(SDK_ROOT)/components/libraries/hardfault/hardfault_implementation.c \
   $(SDK_ROOT)/components/libraries/util/nrf_assert.c \
   $(SDK_ROOT)/components/libraries/util/sdk_mapped_flags.c \
+  $(SDK_ROOT)/external/freertos/source/croutine.c \
+  $(SDK_ROOT)/external/freertos/source/event_groups.c \
+  $(SDK_ROOT)/external/freertos/source/portable/MemMang/heap_1.c \
+  $(SDK_ROOT)/external/freertos/source/list.c \
+  $(SDK_ROOT)/external/freertos/portable/GCC/nrf52/port.c \
+  $(SDK_ROOT)/external/freertos/portable/CMSIS/nrf52/port_cmsis.c \
+  $(SDK_ROOT)/external/freertos/portable/CMSIS/nrf52/port_cmsis_systick.c \
+  $(SDK_ROOT)/external/freertos/source/queue.c \
+  $(SDK_ROOT)/external/freertos/source/tasks.c \
+  $(SDK_ROOT)/external/freertos/source/timers.c \
   $(SDK_ROOT)/components/drivers_nrf/clock/nrf_drv_clock.c \
   $(SDK_ROOT)/components/drivers_nrf/common/nrf_drv_common.c \
   $(SDK_ROOT)/components/drivers_nrf/gpiote/nrf_drv_gpiote.c \
@@ -47,7 +56,6 @@ SRC_FILES += \
   $(SDK_ROOT)/components/ble/peer_manager/gatt_cache_manager.c \
   $(SDK_ROOT)/components/ble/peer_manager/gatts_cache_manager.c \
   $(SDK_ROOT)/components/ble/peer_manager/id_manager.c \
-  $(SDK_ROOT)/components/ble/nrf_ble_qwr/nrf_ble_qwr.c \
   $(SDK_ROOT)/components/ble/peer_manager/peer_data.c \
   $(SDK_ROOT)/components/ble/peer_manager/peer_data_storage.c \
   $(SDK_ROOT)/components/ble/peer_manager/peer_database.c \
@@ -60,10 +68,11 @@ SRC_FILES += \
   $(SDK_ROOT)/components/toolchain/gcc/gcc_startup_nrf52.S \
   $(SDK_ROOT)/components/toolchain/system_nrf52.c \
   $(SDK_ROOT)/components/softdevice/common/softdevice_handler/softdevice_handler.c \
-  $(SDK_ROOT)/components/libraries/scheduler/app_scheduler.c \
+  $(SDK_ROOT)/components/ble/nrf_ble_qwr/nrf_ble_qwr.c \
 
 # Include folders common to all targets
 INC_FOLDERS += \
+  $(PROJ_DIR)/config/freertos_pca10040_s132 \
   $(PROJ_DIR)/service_debug \
   $(PROJ_DIR)/service_canonical \
   $(PROJ_DIR)/pca10040/s132/config \
@@ -85,6 +94,7 @@ INC_FOLDERS += \
   $(SDK_ROOT)/components/ble/ble_services/ble_bas_c \
   $(SDK_ROOT)/components/ble/ble_services/ble_hrs_c \
   $(SDK_ROOT)/examples/bsp \
+  $(SDK_ROOT)/external/freertos/portable/GCC/nrf52 \
   $(SDK_ROOT)/components/ble/ble_dtm \
   $(SDK_ROOT)/components/libraries/crc16 \
   $(SDK_ROOT)/components/libraries/mailbox \
@@ -93,6 +103,8 @@ INC_FOLDERS += \
   $(SDK_ROOT)/components/ble/common \
   $(SDK_ROOT)/components/ble/ble_services/ble_lls \
   $(SDK_ROOT)/components/drivers_nrf/wdt \
+  $(SDK_ROOT)/components/libraries/hardfault/nrf52 \
+  $(SDK_ROOT)/external/freertos/config \
   $(SDK_ROOT)/components/ble/ble_services/ble_bas \
   $(SDK_ROOT)/components/libraries/experimental_section_vars \
   $(SDK_ROOT)/components/softdevice/s132/headers \
@@ -136,6 +148,7 @@ INC_FOLDERS += \
   $(SDK_ROOT)/components/ble/ble_services/ble_hids \
   $(SDK_ROOT)/components/drivers_nrf/pdm \
   $(SDK_ROOT)/components/libraries/crc32 \
+  $(SDK_ROOT)/external/freertos/source/include \
   $(SDK_ROOT)/components/ble/peer_manager \
   $(SDK_ROOT)/components/drivers_nrf/swi \
   $(SDK_ROOT)/components/ble/ble_services/ble_tps \
@@ -143,6 +156,7 @@ INC_FOLDERS += \
   $(SDK_ROOT)/components/device \
   $(SDK_ROOT)/components/ble/nrf_ble_qwr \
   $(SDK_ROOT)/components/libraries/button \
+  $(SDK_ROOT)/external/freertos/portable/CMSIS/nrf52 \
   $(SDK_ROOT)/components/drivers_nrf/saadc \
   $(SDK_ROOT)/components/ble/ble_services/ble_lbs_c \
   $(SDK_ROOT)/components/ble/ble_racp \
@@ -159,6 +173,7 @@ INC_FOLDERS += \
 LIB_FILES += \
 
 # C flags common to all targets
+CFLAGS += -D__STACK_SIZE=2048
 CFLAGS += -DNRF52
 CFLAGS += -DBOARD_PCA10040
 CFLAGS += -DNRF52832
@@ -172,7 +187,7 @@ CFLAGS += -DNRF52_PAN_30
 CFLAGS += -DNRF52_PAN_51
 CFLAGS += -DNRF52_PAN_36
 CFLAGS += -DNRF52_PAN_53
-CFLAGS += -D__HEAP_SIZE=0
+CFLAGS += -D__HEAP_SIZE=1024
 CFLAGS += -DNRF_LOG_USES_RTT=1
 CFLAGS += -DS132
 CFLAGS += -DCONFIG_GPIO_AS_PINRESET
@@ -184,7 +199,9 @@ CFLAGS += -DNRF52_PAN_64
 CFLAGS += -DSOFTDEVICE_PRESENT
 CFLAGS += -DNRF52_PAN_62
 CFLAGS += -DNRF52_PAN_63
+CFLAGS += -DFREERTOS
 CFLAGS += -DSIZE_BLE_PACKET=20
+CFLAGS += -DNRF_BLE_QWR_ENABLED
 CFLAGS += -mcpu=cortex-m4
 CFLAGS += -mthumb -mabi=aapcs
 CFLAGS +=  -Wall -Werror -O0 -g3
@@ -200,6 +217,7 @@ CXXFLAGS += \
 
 # Assembler flags common to all targets
 ASMFLAGS += -x assembler-with-cpp
+ASMFLAGS += -D__STACK_SIZE=2048
 ASMFLAGS += -DNRF52
 ASMFLAGS += -DBOARD_PCA10040
 ASMFLAGS += -DNRF52832
@@ -213,7 +231,7 @@ ASMFLAGS += -DNRF52_PAN_30
 ASMFLAGS += -DNRF52_PAN_51
 ASMFLAGS += -DNRF52_PAN_36
 ASMFLAGS += -DNRF52_PAN_53
-ASMFLAGS += -D__HEAP_SIZE=0
+ASMFLAGS += -D__HEAP_SIZE=1024
 ASMFLAGS += -DS132
 ASMFLAGS += -DCONFIG_GPIO_AS_PINRESET
 ASMFLAGS += -DBLE_STACK_SUPPORT_REQD
@@ -224,6 +242,8 @@ ASMFLAGS += -DNRF52_PAN_64
 ASMFLAGS += -DSOFTDEVICE_PRESENT
 ASMFLAGS += -DNRF52_PAN_62
 ASMFLAGS += -DNRF52_PAN_63
+ASMFLAGS += -DFREERTOS
+ASMFLAGS += -DNRF_BLE_QWR_ENABLED
 
 # Linker flags
 LDFLAGS += -mthumb -mabi=aapcs -L $(TEMPLATE_PATH) -T$(LINKER_SCRIPT)

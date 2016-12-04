@@ -41,6 +41,11 @@
 			<locationURI>virtual:/virtual</locationURI>
 		</link>
 		<link>
+			<name>RTOS</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
 			<name>nRF_BLE</name>
 			<type>2</type>
 			<locationURI>virtual:/virtual</locationURI>
@@ -109,6 +114,56 @@
 			<name>Device/system_nrf52.c</name>
 			<type>1</type>
 			<locationURI>PARENT-6-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/components/toolchain/system_nrf52.c</locationURI>
+		</link>
+		<link>
+			<name>RTOS/app_timer_freertos.c</name>
+			<type>1</type>
+			<locationURI>PARENT-7-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/components/libraries/timer/app_timer_freertos.c</locationURI>
+		</link>
+		<link>
+			<name>RTOS/croutine.c</name>
+			<type>1</type>
+			<locationURI>PARENT-7-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/external/freertos/source/croutine.c</locationURI>
+		</link>
+		<link>
+			<name>RTOS/event_groups.c</name>
+			<type>1</type>
+			<locationURI>PARENT-7-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/external/freertos/source/event_groups.c</locationURI>
+		</link>
+		<link>
+			<name>RTOS/list.c</name>
+			<type>1</type>
+			<locationURI>PARENT-7-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/external/freertos/source/list.c</locationURI>
+		</link>
+		<link>
+			<name>RTOS/port.c</name>
+			<type>1</type>
+			<locationURI>PARENT-7-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/external/freertos/portable/GCC/nrf52/port.c</locationURI>
+		</link>
+		<link>
+			<name>RTOS/port_cmsis.c</name>
+			<type>1</type>
+			<locationURI>PARENT-7-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/external/freertos/portable/CMSIS/nrf52/port_cmsis.c</locationURI>
+		</link>
+		<link>
+			<name>RTOS/port_cmsis_systick.c</name>
+			<type>1</type>
+			<locationURI>PARENT-7-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/external/freertos/portable/CMSIS/nrf52/port_cmsis_systick.c</locationURI>
+		</link>
+		<link>
+			<name>RTOS/queue.c</name>
+			<type>1</type>
+			<locationURI>PARENT-7-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/external/freertos/source/queue.c</locationURI>
+		</link>
+		<link>
+			<name>RTOS/tasks.c</name>
+			<type>1</type>
+			<locationURI>PARENT-7-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/external/freertos/source/tasks.c</locationURI>
+		</link>
+		<link>
+			<name>RTOS/timers.c</name>
+			<type>1</type>
+			<locationURI>PARENT-7-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/external/freertos/source/timers.c</locationURI>
 		</link>
 		<link>
 			<name>nRF_BLE/ble_advdata.c</name>
