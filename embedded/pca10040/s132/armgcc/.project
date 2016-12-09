@@ -66,6 +66,11 @@
 			<locationURI>virtual:/virtual</locationURI>
 		</link>
 		<link>
+			<name>Application/DebugComponent.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/modules/DebugComponent.cpp</locationURI>
+		</link>
+		<link>
 			<name>Application/ble_canonical_service.c</name>
 			<type>1</type>
 			<locationURI>PARENT-3-PROJECT_LOC/service_canonical/ble_canonical_service.c</locationURI>
@@ -91,9 +96,9 @@
 			<locationURI>PARENT-3-PROJECT_LOC/service_debug/debug_service_if.c</locationURI>
 		</link>
 		<link>
-			<name>Application/main.c</name>
+			<name>Application/main.cpp</name>
 			<type>1</type>
-			<locationURI>PARENT-3-PROJECT_LOC/main.c</locationURI>
+			<locationURI>PARENT-3-PROJECT_LOC/main.cpp</locationURI>
 		</link>
 		<link>
 			<name>Board Support/bsp.c</name>

@@ -1,5 +1,17 @@
+#define NRF_LOG_MODULE_NAME "APP"
+
 #include <stdint.h>
 #include <string.h>
+
+
+extern "C" {
+#include "softdevice_handler.h"
+
+#include "FreeRTOS.h"
+#include "task.h"
+#include "timers.h"
+#include "semphr.h"
+
 #include "nordic_common.h"
 #include "nrf.h"
 #include "app_error.h"
@@ -10,27 +22,32 @@
 #include "ble_advertising.h"
 #include "ble_conn_params.h"
 #include "boards.h"
-#include "softdevice_handler.h"
+
 #include "app_timer.h"
 #include "peer_manager.h"
-#include "bsp.h"
-#include "bsp_btn_ble.h"
 #include "canonical_service_if.h"
 #include "debug_service_if.h"
 
-#include "FreeRTOS.h"
-#include "task.h"
-#include "timers.h"
-#include "semphr.h"
 #include "fds.h"
 #include "fstorage.h"
 #include "ble_conn_state.h"
 #include "nrf_drv_clock.h"
-#define NRF_LOG_MODULE_NAME "APP"
 #include "nrf_log.h"
 #include "nrf_log_ctrl.h"
 #include "nrf_ble_qwr.h"
+}
 
+
+
+#include "bsp.h"
+#include "bsp_btn_ble.h"
+#include "DebugComponent.hpp"
+
+//#include <new>          // std::nothrow
+//#include <stdlib.h>
+DebugComponent * _pDebug;
+
+// http://morf.lv/modules.php?name=tutorials&lasit=36
 
 #define IS_SRVC_CHANGED_CHARACT_PRESENT  1                                          /**< Include or not the service_changed characteristic. if not enabled, the server's database cannot be changed for the lifetime of the device*/
 
@@ -112,6 +129,8 @@ static void test_timeout_handler(TimerHandle_t xTimer)
 	}
 	canonical_send(canonical_notification);
 	debug_send(canonical_notification);
+
+    _pDebug->Write("a Debug Module Write");
 }
 
 
@@ -277,7 +296,7 @@ static void fds_evt_handler(fds_evt_t const * const p_evt)
 static void timers_init(void)
 {
     // Initialize timer module.
-    APP_TIMER_INIT(APP_TIMER_PRESCALER, APP_TIMER_OP_QUEUE_SIZE, false);
+    APP_TIMER_INIT(APP_TIMER_PRESCALER, APP_TIMER_OP_QUEUE_SIZE, NULL /* false */);
 
     // Create timers.
     m_test_timer = xTimerCreate("TEST",
@@ -838,7 +857,7 @@ static void logger_thread(void * arg)
 /**@brief A function which is hooked to idle task.
  * @note Idle hook must be enabled in FreeRTOS configuration (configUSE_IDLE_HOOK).
  */
-void vApplicationIdleHook( void )
+extern "C" void vApplicationIdleHook( void )
 {
      vTaskResume(m_logger_thread);
 }
@@ -851,6 +870,10 @@ int main(void)
     ret_code_t err_code;
     err_code = nrf_drv_clock_init();
     APP_ERROR_CHECK(err_code);
+
+    //DebugComponent debug();
+    //_pDebug = new (std::nothrow) DebugComponent();
+    _pDebug = new DebugComponent;
 
     // Do not start any interrupt that uses system functions before system initialisation.
     // The best solution is to start the OS before any other initalisation.

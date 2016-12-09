@@ -40,7 +40,7 @@ SRC_FILES += \
   $(SDK_ROOT)/components/drivers_nrf/uart/nrf_drv_uart.c \
   $(SDK_ROOT)/examples/bsp/bsp.c \
   $(SDK_ROOT)/examples/bsp/bsp_btn_ble.c \
-  $(PROJ_DIR)/main.c \
+  $(PROJ_DIR)/main.cpp \
   $(PROJ_DIR)/service_debug/ble_debug_service.c \
   $(PROJ_DIR)/service_debug/debug_service_if.c \
   $(PROJ_DIR)/service_canonical/ble_canonical_service.c \
@@ -69,6 +69,7 @@ SRC_FILES += \
   $(SDK_ROOT)/components/toolchain/system_nrf52.c \
   $(SDK_ROOT)/components/softdevice/common/softdevice_handler/softdevice_handler.c \
   $(SDK_ROOT)/components/ble/nrf_ble_qwr/nrf_ble_qwr.c \
+  $(PROJ_DIR)/modules/DebugComponent.cpp \
 
 # Include folders common to all targets
 INC_FOLDERS += \
@@ -168,9 +169,10 @@ INC_FOLDERS += \
   $(SDK_ROOT)/components/softdevice/common/softdevice_handler \
   $(SDK_ROOT)/components/ble/ble_services/ble_hrs \
   $(SDK_ROOT)/components/libraries/log/src \
+  $(PROJ_DIR)/modules/
 
 # Libraries common to all targets
-LIB_FILES += \
+LIB_FILES += -lstdc++ \
 
 # C flags common to all targets
 CFLAGS += -D__STACK_SIZE=2048
@@ -213,7 +215,7 @@ CFLAGS += -fno-builtin --short-enums
 CFLAGS += -MP -MD
 
 # C++ flags common to all targets
-CXXFLAGS += \
+CXXFLAGS += $(CFLAGS) -fno-exceptions -fno-rtti
 
 # Assembler flags common to all targets
 ASMFLAGS += -x assembler-with-cpp
