@@ -46,6 +46,21 @@
 			<locationURI>virtual:/virtual</locationURI>
 		</link>
 		<link>
+			<name>_gcc-arm-none-eabi-5_4-2016q2</name>
+			<type>2</type>
+			<location>/home/stevers/projects/nordic/gcc-arm-none-eabi-5_4-2016q2</location>
+		</link>
+		<link>
+			<name>_nRF5_SDK_12.2.0_f012e</name>
+			<type>2</type>
+			<location>/home/stevers/projects/nordic/nRF5_SDK_12.2.0_f012efa</location>
+		</link>
+		<link>
+			<name>config</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
 			<name>nRF_BLE</name>
 			<type>2</type>
 			<locationURI>virtual:/virtual</locationURI>
@@ -81,11 +96,6 @@
 			<locationURI>PARENT-3-PROJECT_LOC/service_debug/ble_debug_service.c</locationURI>
 		</link>
 		<link>
-			<name>Application/ble_test_profile_test_service.c</name>
-			<type>1</type>
-			<locationURI>PARENT-3-PROJECT_LOC/ble_test_profile_test_service.c</locationURI>
-		</link>
-		<link>
 			<name>Application/canonical_service_if.c</name>
 			<type>1</type>
 			<locationURI>PARENT-3-PROJECT_LOC/service_canonical/canonical_service_if.c</locationURI>
@@ -101,24 +111,29 @@
 			<locationURI>PARENT-3-PROJECT_LOC/main.cpp</locationURI>
 		</link>
 		<link>
+			<name>Board Support/boards.c</name>
+			<type>1</type>
+			<locationURI>SDK_LOC/components/boards/boards.c</locationURI>
+		</link>
+		<link>
 			<name>Board Support/bsp.c</name>
 			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/examples/bsp/bsp.c</locationURI>
+			<locationURI>SDK_LOC/components/libraries/bsp/bsp.c</locationURI>
 		</link>
 		<link>
 			<name>Board Support/bsp_btn_ble.c</name>
 			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/examples/bsp/bsp_btn_ble.c</locationURI>
+			<locationURI>SDK_LOC/components/libraries/bsp/bsp_btn_ble.c</locationURI>
 		</link>
 		<link>
 			<name>Device/gcc_startup_nrf52.S</name>
 			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/components/toolchain/gcc/gcc_startup_nrf52.S</locationURI>
+			<locationURI>SDK_LOC/components/toolchain/gcc/gcc_startup_nrf52.S</locationURI>
 		</link>
 		<link>
 			<name>Device/system_nrf52.c</name>
 			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/components/toolchain/system_nrf52.c</locationURI>
+			<locationURI>SDK_LOC/components/toolchain/system_nrf52.c</locationURI>
 		</link>
 		<link>
 			<name>RTOS/app_timer_freertos.c</name>
@@ -128,227 +143,238 @@
 		<link>
 			<name>RTOS/croutine.c</name>
 			<type>1</type>
-			<locationURI>PARENT-7-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/external/freertos/source/croutine.c</locationURI>
+			<locationURI>SDK_LOC/external/freertos/source/croutine.c</locationURI>
 		</link>
 		<link>
 			<name>RTOS/event_groups.c</name>
 			<type>1</type>
-			<locationURI>PARENT-7-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/external/freertos/source/event_groups.c</locationURI>
+			<locationURI>SDK_LOC/external/freertos/source/event_groups.c</locationURI>
 		</link>
 		<link>
 			<name>RTOS/list.c</name>
 			<type>1</type>
-			<locationURI>PARENT-7-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/external/freertos/source/list.c</locationURI>
+			<locationURI>SDK_LOC/external/freertos/source/list.c</locationURI>
 		</link>
 		<link>
 			<name>RTOS/port.c</name>
 			<type>1</type>
-			<locationURI>PARENT-7-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/external/freertos/portable/GCC/nrf52/port.c</locationURI>
+			<locationURI>SDK_LOC/external/freertos/portable/GCC/nrf52/port.c</locationURI>
 		</link>
 		<link>
 			<name>RTOS/port_cmsis.c</name>
 			<type>1</type>
-			<locationURI>PARENT-7-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/external/freertos/portable/CMSIS/nrf52/port_cmsis.c</locationURI>
+			<locationURI>SDK_LOC/external/freertos/portable/CMSIS/nrf52/port_cmsis.c</locationURI>
 		</link>
 		<link>
 			<name>RTOS/port_cmsis_systick.c</name>
 			<type>1</type>
-			<locationURI>PARENT-7-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/external/freertos/portable/CMSIS/nrf52/port_cmsis_systick.c</locationURI>
+			<locationURI>SDK_LOC/external/freertos/portable/CMSIS/nrf52/port_cmsis_systick.c</locationURI>
 		</link>
 		<link>
 			<name>RTOS/queue.c</name>
 			<type>1</type>
-			<locationURI>PARENT-7-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/external/freertos/source/queue.c</locationURI>
+			<locationURI>SDK_LOC/external/freertos/source/queue.c</locationURI>
 		</link>
 		<link>
 			<name>RTOS/tasks.c</name>
 			<type>1</type>
-			<locationURI>PARENT-7-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/external/freertos/source/tasks.c</locationURI>
+			<locationURI>SDK_LOC/external/freertos/source/tasks.c</locationURI>
 		</link>
 		<link>
 			<name>RTOS/timers.c</name>
 			<type>1</type>
-			<locationURI>PARENT-7-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/external/freertos/source/timers.c</locationURI>
+			<locationURI>SDK_LOC/external/freertos/source/timers.c</locationURI>
+		</link>
+		<link>
+			<name>config/FreeRTOSConfig.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-ECLIPSE_HOME/git_clones/nordic/nordic/embedded/config/freertos_pca10040_s132/FreeRTOSConfig.h</locationURI>
+		</link>
+		<link>
+			<name>config/sdk_config.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-ECLIPSE_HOME/git_clones/nordic/nordic/embedded/pca10040/s132/config/sdk_config.h</locationURI>
 		</link>
 		<link>
 			<name>nRF_BLE/ble_advdata.c</name>
 			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/components/ble/common/ble_advdata.c</locationURI>
+			<locationURI>SDK_LOC/components/ble/common/ble_advdata.c</locationURI>
 		</link>
 		<link>
 			<name>nRF_BLE/ble_conn_params.c</name>
 			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/components/ble/common/ble_conn_params.c</locationURI>
+			<locationURI>SDK_LOC/components/ble/common/ble_conn_params.c</locationURI>
 		</link>
 		<link>
 			<name>nRF_BLE/ble_conn_state.c</name>
 			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/components/ble/common/ble_conn_state.c</locationURI>
+			<locationURI>SDK_LOC/components/ble/common/ble_conn_state.c</locationURI>
 		</link>
 		<link>
 			<name>nRF_BLE/ble_srv_common.c</name>
 			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/components/ble/common/ble_srv_common.c</locationURI>
+			<locationURI>SDK_LOC/components/ble/common/ble_srv_common.c</locationURI>
 		</link>
 		<link>
 			<name>nRF_BLE/gatt_cache_manager.c</name>
 			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/components/ble/peer_manager/gatt_cache_manager.c</locationURI>
+			<locationURI>SDK_LOC/components/ble/peer_manager/gatt_cache_manager.c</locationURI>
 		</link>
 		<link>
 			<name>nRF_BLE/gatts_cache_manager.c</name>
 			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/components/ble/peer_manager/gatts_cache_manager.c</locationURI>
+			<locationURI>SDK_LOC/components/ble/peer_manager/gatts_cache_manager.c</locationURI>
 		</link>
 		<link>
 			<name>nRF_BLE/nrf_ble_qwr.c</name>
 			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/components/ble/nrf_ble_qwr/nrf_ble_qwr.c</locationURI>
+			<locationURI>SDK_LOC/components/ble/nrf_ble_qwr/nrf_ble_qwr.c</locationURI>
 		</link>
 		<link>
 			<name>nRF_BLE/peer_data.c</name>
 			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/components/ble/peer_manager/peer_data.c</locationURI>
+			<locationURI>SDK_LOC/components/ble/peer_manager/peer_data.c</locationURI>
 		</link>
 		<link>
 			<name>nRF_BLE/peer_data_storage.c</name>
 			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/components/ble/peer_manager/peer_data_storage.c</locationURI>
+			<locationURI>SDK_LOC/components/ble/peer_manager/peer_data_storage.c</locationURI>
 		</link>
 		<link>
 			<name>nRF_BLE/peer_database.c</name>
 			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/components/ble/peer_manager/peer_database.c</locationURI>
+			<locationURI>SDK_LOC/components/ble/peer_manager/peer_database.c</locationURI>
 		</link>
 		<link>
 			<name>nRF_BLE/peer_id.c</name>
 			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/components/ble/peer_manager/peer_id.c</locationURI>
+			<locationURI>SDK_LOC/components/ble/peer_manager/peer_id.c</locationURI>
 		</link>
 		<link>
 			<name>nRF_BLE/peer_manager.c</name>
 			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/components/ble/peer_manager/peer_manager.c</locationURI>
+			<locationURI>SDK_LOC/components/ble/peer_manager/peer_manager.c</locationURI>
 		</link>
 		<link>
 			<name>nRF_BLE/pm_buffer.c</name>
 			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/components/ble/peer_manager/pm_buffer.c</locationURI>
+			<locationURI>SDK_LOC/components/ble/peer_manager/pm_buffer.c</locationURI>
 		</link>
 		<link>
 			<name>nRF_BLE/pm_mutex.c</name>
 			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/components/ble/peer_manager/pm_mutex.c</locationURI>
+			<locationURI>SDK_LOC/components/ble/peer_manager/pm_mutex.c</locationURI>
 		</link>
 		<link>
 			<name>nRF_BLE/security_dispatcher.c</name>
 			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/components/ble/peer_manager/security_dispatcher.c</locationURI>
+			<locationURI>SDK_LOC/components/ble/peer_manager/security_dispatcher.c</locationURI>
 		</link>
 		<link>
 			<name>nRF_BLE/security_manager.c</name>
 			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/components/ble/peer_manager/security_manager.c</locationURI>
+			<locationURI>SDK_LOC/components/ble/peer_manager/security_manager.c</locationURI>
 		</link>
 		<link>
 			<name>nRF_Libraries/app_button.c</name>
 			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/components/libraries/button/app_button.c</locationURI>
+			<locationURI>SDK_LOC/components/libraries/button/app_button.c</locationURI>
 		</link>
 		<link>
 			<name>nRF_Libraries/app_error.c</name>
 			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/components/libraries/util/app_error.c</locationURI>
+			<locationURI>SDK_LOC/components/libraries/util/app_error.c</locationURI>
 		</link>
 		<link>
 			<name>nRF_Libraries/app_error_weak.c</name>
 			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/components/libraries/util/app_error_weak.c</locationURI>
+			<locationURI>SDK_LOC/components/libraries/util/app_error_weak.c</locationURI>
 		</link>
 		<link>
 			<name>nRF_Libraries/app_fifo.c</name>
 			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/components/libraries/fifo/app_fifo.c</locationURI>
+			<locationURI>SDK_LOC/components/libraries/fifo/app_fifo.c</locationURI>
 		</link>
 		<link>
-			<name>nRF_Libraries/app_scheduler.c</name>
+			<name>nRF_Libraries/app_timer_freertos.c</name>
 			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/components/libraries/scheduler/app_scheduler.c</locationURI>
-		</link>
-		<link>
-			<name>nRF_Libraries/app_timer.c</name>
-			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/components/libraries/timer/app_timer.c</locationURI>
-		</link>
-		<link>
-			<name>nRF_Libraries/app_timer_appsh.c</name>
-			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/components/libraries/timer/app_timer_appsh.c</locationURI>
+			<locationURI>SDK_LOC/components/libraries/timer/app_timer_freertos.c</locationURI>
 		</link>
 		<link>
 			<name>nRF_Libraries/app_util_platform.c</name>
 			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/components/libraries/util/app_util_platform.c</locationURI>
+			<locationURI>SDK_LOC/components/libraries/util/app_util_platform.c</locationURI>
 		</link>
 		<link>
 			<name>nRF_Libraries/crc16.c</name>
 			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/components/libraries/crc16/crc16.c</locationURI>
+			<locationURI>SDK_LOC/components/libraries/crc16/crc16.c</locationURI>
 		</link>
 		<link>
 			<name>nRF_Libraries/fds.c</name>
 			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/components/libraries/fds/fds.c</locationURI>
+			<locationURI>SDK_LOC/components/libraries/fds/fds.c</locationURI>
 		</link>
 		<link>
 			<name>nRF_Libraries/fstorage.c</name>
 			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/components/libraries/fstorage/fstorage.c</locationURI>
+			<locationURI>SDK_LOC/components/libraries/fstorage/fstorage.c</locationURI>
+		</link>
+		<link>
+			<name>nRF_Libraries/hardfault_handler_gcc.c</name>
+			<type>1</type>
+			<locationURI>SDK_LOC/components/libraries/hardfault/nrf52/handler/hardfault_handler_gcc.c</locationURI>
 		</link>
 		<link>
 			<name>nRF_Libraries/hardfault_implementation.c</name>
 			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/components/libraries/hardfault/hardfault_implementation.c</locationURI>
+			<locationURI>SDK_LOC/components/libraries/hardfault/hardfault_implementation.c</locationURI>
 		</link>
 		<link>
 			<name>nRF_Libraries/nrf_assert.c</name>
 			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/components/libraries/util/nrf_assert.c</locationURI>
+			<locationURI>SDK_LOC/components/libraries/util/nrf_assert.c</locationURI>
 		</link>
 		<link>
 			<name>nRF_Libraries/nrf_log_backend_serial.c</name>
 			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/components/libraries/log/src/nrf_log_backend_serial.c</locationURI>
+			<locationURI>SDK_LOC/components/libraries/log/src/nrf_log_backend_serial.c</locationURI>
 		</link>
 		<link>
 			<name>nRF_Libraries/nrf_log_frontend.c</name>
 			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/components/libraries/log/src/nrf_log_frontend.c</locationURI>
+			<locationURI>SDK_LOC/components/libraries/log/src/nrf_log_frontend.c</locationURI>
 		</link>
 		<link>
 			<name>nRF_Libraries/sdk_mapped_flags.c</name>
 			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/components/libraries/util/sdk_mapped_flags.c</locationURI>
+			<locationURI>SDK_LOC/components/libraries/util/sdk_mapped_flags.c</locationURI>
 		</link>
 		<link>
 			<name>nRF_Segger_RTT/RTT_Syscalls_GCC.c</name>
 			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/external/segger_rtt/RTT_Syscalls_GCC.c</locationURI>
+			<locationURI>SDK_LOC/external/segger_rtt/RTT_Syscalls_GCC.c</locationURI>
 		</link>
 		<link>
 			<name>nRF_Segger_RTT/SEGGER_RTT.c</name>
 			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/external/segger_rtt/SEGGER_RTT.c</locationURI>
+			<locationURI>SDK_LOC/external/segger_rtt/SEGGER_RTT.c</locationURI>
 		</link>
 		<link>
 			<name>nRF_Segger_RTT/SEGGER_RTT_printf.c</name>
 			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/external/segger_rtt/SEGGER_RTT_printf.c</locationURI>
+			<locationURI>SDK_LOC/external/segger_rtt/SEGGER_RTT_printf.c</locationURI>
 		</link>
 		<link>
 			<name>nRF_Softdevice/softdevice_handler.c</name>
 			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/nRF5_SDK_12.1.0_0d23e2a/components/softdevice/common/softdevice_handler/softdevice_handler.c</locationURI>
+			<locationURI>SDK_LOC/components/softdevice/common/softdevice_handler/softdevice_handler.c</locationURI>
 		</link>
 	</linkedResources>
+	<variableList>
+		<variable>
+			<name>SDK_LOC</name>
+			<value>file:/home/stevers/projects/nordic/nRF5_SDK_12.2.0_f012efa</value>
+		</variable>
+	</variableList>
 </projectDescription>
