@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">Compacket</string>
+	
+    <string name="service_name_54E0870145FC47A6BC5A271CBF32A267">Service: Debug Service</string>
+    <string name="service_uuid_54E0870145FC47A6BC5A271CBF32A267">Service: 54E0870145FC47A6BC5A271CBF32A267</string>
+
+
+    <string name="characteristic_name_54E028A545FC47A6BC5A271CBF32A267">Characteristic: control</string>
+    <string name="characteristic_uuid_54E028A545FC47A6BC5A271CBF32A267">Characteristic: 54E028A545FC47A6BC5A271CBF32A267</string>
+    <string name="characteristic_name_54E0073345FC47A6BC5A271CBF32A267">Characteristic: log</string>
+    <string name="characteristic_uuid_54E0073345FC47A6BC5A271CBF32A267">Characteristic: 54E0073345FC47A6BC5A271CBF32A267</string>
+
+
+    <color name="white">#FFFFFF</color>
+    <color name="blue">#CEECF5</color>
+    <string name="action_settings"></string>
+	
+</resources>

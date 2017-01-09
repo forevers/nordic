@@ -1,0 +1,184 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android" 
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/deviceView"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:paddingBottom="10dip"
+    android:paddingLeft="10dip"
+    android:paddingTop="10dip">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/border"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/nameTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="15dp"
+            android:paddingLeft="10dip"
+            android:text="Device name: " />
+
+        <TextView
+            android:id="@+id/rssiTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="10dp"
+            android:paddingLeft="10dip"
+            android:text="RSSI" />
+
+        <Button
+            android:id="@+id/button_connect"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="20dip"
+            android:onClick="onConnect"
+            android:text="Connect" />
+
+        <TextView
+            android:id="@+id/msgTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="10dp"
+            android:paddingLeft="10dip"
+            android:text="" />
+
+    </LinearLayout>
+
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/border"
+        android:paddingBottom="5dip"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="5dip"
+            android:paddingLeft="10dip"
+            android:textColor="#0000FF"
+            android:text="@string/service_name_54E0870145FC47A6BC5A271CBF32A267" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dip"
+            android:text="@string/service_uuid_54E0870145FC47A6BC5A271CBF32A267" />
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="20dip"
+                android:textColor="#FF0000"
+                android:text="@string/characteristic_name_54E028A545FC47A6BC5A271CBF32A267" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="20dip"
+                android:text="54E028A545FC47A6BC5A271CBF32A267" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="20dip"
+                android:text="wr" />
+
+            <EditText
+                android:id="@+id/text_54E0870145FC47A6BC5A271CBF32A267_54E028A545FC47A6BC5A271CBF32A267"
+                android:layout_width="fill_parent"
+                android:paddingLeft="20dip"
+                android:paddingRight="20dip"
+                android:background="#E4FEFD"
+                android:tag="gatt_op_54E0870145FC47A6BC5A271CBF32A267_54E028A545FC47A6BC5A271CBF32A267"
+                android:enabled="false"
+                android:layout_height="wrap_content" />
+
+            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/button_write_54E0870145FC47A6BC5A271CBF32A267_54E028A545FC47A6BC5A271CBF32A267"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="20dip"
+                    android:tag="gatt_op_54E0870145FC47A6BC5A271CBF32A267_54E028A545FC47A6BC5A271CBF32A267"
+                    android:enabled="false"
+                    android:onClick="onWrite"
+                    android:text="Write" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="20dip"
+                android:textColor="#FF0000"
+                android:text="@string/characteristic_name_54E0073345FC47A6BC5A271CBF32A267" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="20dip"
+                android:text="54E0073345FC47A6BC5A271CBF32A267" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="20dip"
+                android:text="n" />
+
+            <TextView
+                android:id="@+id/text_54E0870145FC47A6BC5A271CBF32A267_54E0073345FC47A6BC5A271CBF32A267"
+                android:layout_width="wrap_content"
+                android:paddingLeft="20dip"
+                android:background="#E4FEFD"
+                android:tag="gatt_op_54E0870145FC47A6BC5A271CBF32A267_54E0073345FC47A6BC5A271CBF32A267"
+                android:layout_height="wrap_content" />
+
+            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/button_notify_54E0870145FC47A6BC5A271CBF32A267_54E0073345FC47A6BC5A271CBF32A267"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="20dip"
+                    android:tag="gatt_op_54E0870145FC47A6BC5A271CBF32A267_54E0073345FC47A6BC5A271CBF32A267"
+                    android:enabled="false"
+                    android:onClick="onNotify"
+                    android:text="Enable Notifications" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+</LinearLayout>
+</ScrollView>
