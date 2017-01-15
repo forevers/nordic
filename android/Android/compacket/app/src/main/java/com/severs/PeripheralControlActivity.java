@@ -1,30 +1,26 @@
 package com.severs;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-
-import java.util.Timer;
-import java.util.TimerTask;
-
 import android.app.Activity;
-import android.bluetooth.BluetoothDevice;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.res.AssetFileDescriptor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.view.WindowManager;
-import java.util.*;
-import android.util.Log;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class PeripheralControlActivity extends Activity {
 
@@ -38,6 +34,14 @@ public class PeripheralControlActivity extends Activity {
     private String mDeviceAddress;
     private BleAdapterService mBluetoothLeService;
     private Timer mTimer;
+
+    // accumulated debug string
+    String mDebugString;
+
+    // debug log scroll view
+    ScrollView mScrollView;
+    // debug log text view within scrollview
+    TextView mLogTextView;
 
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
 
@@ -58,6 +62,9 @@ public class PeripheralControlActivity extends Activity {
         initialiseCharacteristicProperties();
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         setContentView(R.layout.activity_peripheral_control);
+
+        mScrollView = (ScrollView)findViewById(R.id.textAreaScroller);
+        mLogTextView = (TextView) findViewById(R.id.text_54E0870145FC47A6BC5A271CBF32A267_54E0073345FC47A6BC5A271CBF32A267);
 
         // read intent data
         final Intent intent = getIntent();
@@ -190,6 +197,18 @@ public class PeripheralControlActivity extends Activity {
         }
     }
 
+    /** scroll text to the bottom of the view */
+    private void scrollToBottom()
+    {
+        mScrollView.post(new Runnable()
+        {
+            public void run()
+            {
+                mScrollView.smoothScrollTo(0, mLogTextView.getBottom());
+            }
+        });
+    }
+
     // Service message handler
     private Handler mMessageHandler = new Handler() {
         @Override
@@ -264,7 +283,9 @@ public class PeripheralControlActivity extends Activity {
                     value_text = (TextView) findViewByUUIDs(VIEW_TYPE_TEXT_VIEW, service_uuid, characteristic_uuid);
                     if (value_text != null) {
                         Log.d(Constants.TAG, "Handler found TextView for characteristic value");
-                        value_text.setText(Utility.byteArrayAsHexString(b));
+                        mDebugString = mDebugString + '\n' + Utility.byteArrayAsHexString(b);
+                        value_text.setText(mDebugString);
+                        scrollToBottom();
                     }
                     break;
                 case BleAdapterService.GATT_REMOTE_RSSI:

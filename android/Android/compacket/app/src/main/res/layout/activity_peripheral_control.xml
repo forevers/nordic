@@ -1,8 +1,5 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android" 
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
     android:id="@+id/deviceView"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
@@ -128,12 +125,14 @@
 
         </LinearLayout>
 
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
             <TextView
+                android:layout_alignParentTop="true"
+                android:id="@+id/notification_description_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingLeft="20dip"
@@ -141,26 +140,36 @@
                 android:text="@string/characteristic_name_54E0073345FC47A6BC5A271CBF32A267" />
 
             <TextView
+                android:layout_below="@+id/notification_description_text"
+                android:id="@+id/notification_uuid_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingLeft="20dip"
+                android:paddingRight="20dip"
                 android:text="54E0073345FC47A6BC5A271CBF32A267" />
 
-            <TextView
-                android:layout_width="wrap_content"
+            <ScrollView
+                android:layout_below="@+id/notification_uuid_text"
+                android:layout_above="@+id/notification_button_layout"
+                android:id="@+id/textAreaScroller"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:paddingLeft="20dip"
-                android:text="n" />
+                android:fillViewport="true"
+                android:scrollbars="vertical">
+                <TextView
+                    android:id="@+id/text_54E0870145FC47A6BC5A271CBF32A267_54E0073345FC47A6BC5A271CBF32A267"
+                    android:layout_width="fill_parent"
+                    android:layout_height="match_parent"
+                    android:isScrollContainer="true"
+                    android:paddingLeft="20dip"
+                    android:paddingRight="20dip"
+                    android:background="#E4FEFD"/>
 
-            <TextView
-                android:id="@+id/text_54E0870145FC47A6BC5A271CBF32A267_54E0073345FC47A6BC5A271CBF32A267"
-                android:layout_width="wrap_content"
-                android:paddingLeft="20dip"
-                android:background="#E4FEFD"
-                android:tag="gatt_op_54E0870145FC47A6BC5A271CBF32A267_54E0073345FC47A6BC5A271CBF32A267"
-                android:layout_height="wrap_content" />
+            </ScrollView>
 
             <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/notification_button_layout"
+                android:layout_alignParentBottom="true"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
@@ -177,8 +186,8 @@
 
             </LinearLayout>
 
-        </LinearLayout>
+        </RelativeLayout>
 
     </LinearLayout>
+
 </LinearLayout>
-</ScrollView>
